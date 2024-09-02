@@ -65,11 +65,11 @@ for(let monster of monsters){
     let level = monster._source.level;
 
     let traits = (!monster._source.trait_markdown)
-        ? [{"link": "https://2e.aonprd.com/", "name": "—"}]
+        ? [{"link": "https://2e.aonprd.com/", "name": "None"}]
         : extractLinkNames(monster._source.trait_markdown);
 
     let family = (!monster._source.creature_family_markdown || monster._source.creature_family_markdown == "")
-        ? {"link": "https://2e.aonprd.com/", "name": "—"}
+        ? {"link": "https://2e.aonprd.com/", "name": "None"}
         : extractLinkName(monster._source.creature_family_markdown);
 
     let pfs = monster._source.pfs ?? "—";
@@ -101,7 +101,6 @@ for(let monster of monsters){
         "traits": traits, 
         "level": level, 
         "adventureLabel": pfs, 
-        "alignment": monster._source.alignment ?? "No Alignment"
     };
 
     convertedmonsters.push(convertedmonster);
@@ -110,7 +109,6 @@ for(let monster of monsters){
     stats.log("adventureLabel", pfs);
     stats.log("level", level);
     stats.log("source", extractLinkName(source).name);
-    stats.log("alignment", monster._source.alignment);
     stats.log("size", monster._source.size[0]);
     stats.log("family", family.name);
     stats.logLevelStats("Will Save", level, monster._source.will_save);

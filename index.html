@@ -390,15 +390,15 @@
                                 <option v-for="level in levels" :value="level">{{level}}</option>
                             </select>
                         </div>
-                        <div class="order-2 col-4 col-md-2">
+                        <div class="order-2 col-4 col-sm col-md-2">
                             <label for="familyFilter" class="form-label">Family</label>
                             <multi-select :options="families" @selected="multiSelectToggle(families, $event)" @closed="closeFilterMultiSelect(families)" name="familyFilter"></multi-select>
                         </div>
-                        <div class="order-2 col-4 col-sm col-md-2">
-                            <label for="alignmentFilter" class="form-label">Alignment</label>
-                            <multi-select :options="alignments" @selected="multiSelectToggle(alignments, $event)" @closed="closeFilterMultiSelect(alignments)"
-                                name="alignmentsFilter"></multi-select>
-                        </div>                    
+                        <div class="order-2 col-4 col-sm">
+                            <label for="rarityFilter" class="form-label">Rarity</label>
+                            <multi-select :options="rarities" @selected="multiSelectToggle(rarities, $event)"
+                                @closed="closeFilterMultiSelect(rarities)" name="raritiesFilter"></multi-select>
+                        </div>
                         <div class="order-2 col-4 col-sm">
                             <label for="typeFilter" class="form-label">Type</label>
                             <multi-select :options="types" @selected="multiSelectToggle(types, $event)"
@@ -430,7 +430,7 @@
                                         <th scope="col">Name</th>
                                         <th scope="col">Level</th>
                                         <th scope="col">Family</th>
-                                        <th scope="col">Alignment</th>
+                                        <th scope="col">Rarity</th>
                                         <th scope="col">Types</th>
                                         <th scope="col">Size</th>
                                         <th scope="col">Traits</th>
@@ -462,8 +462,8 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <select v-model='creature.alignment' class="form-select">
-                                                <option v-for="alignment in alignments" :value="alignment.value">{{alignment.displayName}}</option>
+                                            <select v-model='creature.rarity' class="form-select">
+                                                <option v-for="rarity in rarites" :value="rarity.value">{{rarity.displayName}}</option>
                                             </select>
                                         </td>
                                         <td>
@@ -504,7 +504,7 @@
             </div>
         </div>
     </div>
-    <script src='./monsterTable-2023-07-22.js'></script>
+    <script src='./monsterTable-2024-08-02.js'></script>
     <script src='./components/creatureListItem.js'></script>
     <script src='./components/multiSelect.js'></script>
     <script>    
@@ -559,7 +559,7 @@
                 creatureList: creatureList,
                 filters: getDefaultFilters(),
                 partyFilters: { partySizeFilter: 4, partyLevelFilter: 1},
-                alignments: [],
+                rarities: [],
                 families: [],
                 types: [],
                 sizes: [],
@@ -581,10 +581,10 @@
                 nbOfCreaturesInRandomEncounter: 4
             },
             computed: {
-                alignmentFilter: function(){
-                    return this.alignments
-                        .filter((el) => {return el.selected === true})
-                        .map((el) => {return el.value} );
+                rarityFilter: function () {
+                    return this.rarities
+                        .filter((el) => { return el.selected === true })
+                        .map((el) => { return el.value });
                 },
                 familyFilter: function () {
                     return this.families
@@ -629,11 +629,12 @@
             },
             mounted: function(){
                 this.creatureList.forEach((creature) => {
-                    if(!this.alignments.find(lowerCaseMatch(creature.alignment, "value"))){                        
-                        this.alignments.push({displayName:creature.alignment, value:creature.alignment.toLowerCase(), selected: false});
+                    let rarity = creature.rarity.name;
+                    if (!this.rarities.find(lowerCaseMatch(rarity, "value"))) {
+                        this.rarities.push({displayName:rarity, value:rarity.toLowerCase(), selected:false});
                     }
                 });
-                this.alignments.sort(sortString);
+                this.rarities.sort(sortString);
                 
                 this.creatureList.forEach((creature) => {
                     let family = creature.family.name;
@@ -741,7 +742,7 @@
                 'filters.levelMaxFilter': function(){ this.automaticCreatureFilter(); },
                 'filters.familyFilter': function(){ this.automaticCreatureFilter(); },
                 'filters.typeFilter': function(){ this.automaticCreatureFilter(); },
-                'filters.alignmentFilter': function(){ this.automaticCreatureFilter(); },
+                'filters.rarityFilter': function () { this.automaticCreatureFilter(); },
                 'filters.sizeFilter': function(){ this.automaticCreatureFilter(); },
                 'filters.traitFilter': function(){ this.automaticCreatureFilter(); },
                 encounters: {
@@ -789,7 +790,7 @@
                         case 'type': filters = this.types; break;
                         case 'trait': filters = this.traits; break;
                         case 'name': this.updateNameFilter(filterName); return;
-                        case 'alignment': filters = this.alignments; break;
+                        case 'rarity': filters = this.rarities; break;
                         case 'level': this.updateLevelFilter(filterName); return;
                         case 'size': filters = this.sizes; break;
                     }      
@@ -915,9 +916,10 @@
                             isInTheList = false;
                         }
 
-                        if (this.alignmentFilter.length > 0 && !this.alignmentFilter.find((el) => {return el === creature.alignment.toLowerCase();})) {
+                        if (this.rarityFilter.length > 0 && !this.rarityFilter.find((el) => { return el === creature.rarity.name.toLowerCase(); })) {
                             isInTheList = false;
                         };
+
                         if (this.sizeFilter.length > 0 && !this.sizeFilter.find((el) => { return el === creature.size.toLowerCase(); })) {
                             isInTheList = false;
                         };
@@ -962,7 +964,7 @@
                         "name": "Custom Creature " + this.customCreatureId, 
                         "family": this.filters.familyFilter, 
                         "level": level, 
-                        "alignment": this.filters.alignmentFilter, 
+                        "rarity": this.filters.rarityFilter, 
                         "type": this.filters.typeFilter, 
                         "size": this.filters.sizeFilter,
                         "traits": this.filters.traitFilter
@@ -988,7 +990,7 @@
                     this.isAutomaticFilterEnabled = false;
                     
                     this.filters = getDefaultFilters();
-                    this.alignments.map((el) => el.selected = false);
+                    this.rarities.map((el) => el.selected = false);
                     this.families.map((el) => el.selected = false);
                     this.types.map((el) => el.selected = false);
                     this.sizes.map((el) => el.selected = false);

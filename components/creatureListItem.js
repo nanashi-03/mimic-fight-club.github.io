@@ -17,7 +17,9 @@ Vue.component('creature-list-item', {
                 {{creature.family.name}}
             </template>
         </td>
-        <td><span v-on:click.ctrl.exact="$emit('add-filter', [creature.alignment, 'alignment'])">{{ creature.alignment }}</span></td>
+        <td>
+            <a :href="creature.rarity.link" @click.prevent.exact="$emit('open-link', creature.rarity.link)" v-on:click.ctrl.exact="$emit('add-filter', [creature.rarity.name, 'rarity'])">{{ creature.rarity.name }}</a>
+        </td>
         <td>
             <span v-for="(type, index) in creature.types">  
                 <a v-if="type.link !== ''" :href="type.link" @click.prevent.exact="$emit('open-link', type.link)" v-on:click.ctrl.exact="$emit('add-filter', [type.name, 'type'])">{{ type.name }}</a>
